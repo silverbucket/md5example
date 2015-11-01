@@ -31,16 +31,17 @@ var interval = setInterval(function () {
 ////////////////////////////////////////////////////////////////////////////////
 
 var md5Hash = function ( name, ab, cb ) {
-  var spark = new SparkMD5.ArrayBuffer();
-  var md52 = spark.append( ab );
-  var p = document.getElementById('md5_hash');
+  var spark = new SparkMD5.ArrayBuffer(),
+      md52  = spark.append( ab ),
+      p     = document.getElementById('md5_hash');
+
   p.innerHTML = spark.end();
   return cb( name, ab );
 };
 
 var mergeArrayBuffer = function ( name, abSlices, cb ) {
-  var blob = new Blob( abSlices );
-  var fileReader = new FileReader();
+  var blob       = new Blob( abSlices ),
+      fileReader = new FileReader();
 
   fileReader.onload = function () {
     console.log('mergeArrayBuffer size: ' + this.result.byteLength, this.result);
@@ -51,13 +52,13 @@ var mergeArrayBuffer = function ( name, abSlices, cb ) {
 };
 
 var md5Append = function ( name, abSlices, cb ) {
-  var spark = new SparkMD5.ArrayBuffer();
+  var spark = new SparkMD5.ArrayBuffer(),
+      p     = document.getElementById('md5_append');
 
   for ( var i = 0, len = abSlices.length; i < len; i += 1 ) {
     spark.append( abSlices[ i ] );
   }
 
-  var p = document.getElementById('md5_append');
   p.innerHTML = spark.end();
   return cb( name, abSlices );
 };
@@ -84,15 +85,13 @@ var loadImage = function ( name, _abSlices, cb ) {
 };
 
 var displayImage = function ( name, abSlices, cb ) {
+  var blob       = new Blob( abSlices, { type: 'image/jpeg' } ),
+      urlCreator = window.URL || window.webkitURL,
+      imageUrl   = urlCreator.createObjectURL( blob ),
+      imageDiv   = document.getElementById('images'),
+      img        = document.createElement('img');
+
   console.log('- create image from ', abSlices);
-  // create a blob: URL for the image data.
-  // var arrayBufferView = new Uint8Array( ab );
-  // var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
-  var blob = new Blob( abSlices, { type: 'image/jpeg' } );
-  var urlCreator = window.URL || window.webkitURL;
-  var imageUrl = urlCreator.createObjectURL( blob );
-  var imageDiv = document.getElementById('images');
-  var img = document.createElement('img');
   img.src = imageUrl;
   imageDiv.appendChild( img );
   return cb( name, abSlices );
@@ -136,15 +135,8 @@ var divideArrayBuffer = function ( name, ab, cb ) {
 };
 
 var fetchImage = function ( name, cb ) {
-  // Simulate a call to Dropbox or other service that can
-  // return an image as an ArrayBuffer.
   var xhr = new XMLHttpRequest();
-
-  // Use JSFiddle logo as a sample image to avoid complicating
-  // this example with cross-domain issues.
   xhr.open( "GET", name, true );
-
-  // Ask for the result as an ArrayBuffer.
   xhr.responseType = "arraybuffer";
 
   xhr.onload = function( e ) {
@@ -161,9 +153,9 @@ var fetchImage = function ( name, cb ) {
 ////////////////////////////////////////////////////////////////////////////////
 
 var run = function () {
-  var funcs = Array.from( arguments ),
-    startingArguments = [], 
-    callback;
+  var funcs             = Array.from( arguments ),
+      startingArguments = [], 
+      callback;
 
   function __callFunc( pos, args ) {
     if (typeof funcs[ pos ] !== 'function') {
